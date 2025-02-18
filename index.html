@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="zh-CN">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>语音质量主观评测</title>
+    <title>EEG-based VC Demo</title>
     <style>
         body {
             max-width: 1200px;
@@ -41,52 +41,12 @@
         .group {
             margin-bottom: 40px;
         }
-
-        .instructions {
-            background-color: #f8f9fa;
-            padding: 20px;
-            border-radius: 5px;
-            margin-bottom: 30px;
-        }
     </style>
 </head>
 
 <body>
     <div class="header">
-        <h1>语音质量主观评测</h1>
-    </div>
-
-    <div class="instructions">
-        <h2>评测说明</h2>
-        <p><strong>请注意：</strong></p>
-        <ul>
-            <li>请使用质量较好的耳机在安静环境下进行评测</li>
-            <li>请将三个模型（M1、M2、M3）生成的效果与 Ground Truth 进行对比并从以下两个维度打分（模型生成内容可能与Ground Truth不一致，不必过分纠结）：
-                <ul>
-                    <li><strong>声音相似度</strong>：与 Ground Truth 的声音特征相似程度</li>
-                    <li><strong>声音自然度</strong>：生成音频的整体自然程度，是否像真人说话</li>
-                </ul>
-            </li>
-            <li>评分范围：1-5分（1分最差，5分最好），MOS打分的范围包括：1，2，3，3.5，4，4.5，5，其中尽量从3到5打分。</li>
-            <li><strong>声音相似度</strong>评分标准：
-                <ul>
-                    <li>5分：整体音色与Ground Truth非常接近</li>
-                    <li>4分：整体音色相似，但在某些细节特征上有轻微差异</li>
-                    <li>3分：基本音色特征相似，但存在明显的差异</li>
-                    <li>2分：音色特征差异较大，难以识别为同一说话人</li>
-                    <li>1分：完全不同的说话人音色特征</li>
-                </ul>
-            </li>
-            <li><strong>声音自然度</strong>评分标准：
-                <ul>
-                    <li>5分：完美，与 Ground Truth 几乎无差异</li>
-                    <li>4分：好，有轻微差异</li>
-                    <li>3分：一般，有明显差异但可接受</li>
-                    <li>2分：差，差异显著</li>
-                    <li>1分：很差，与 Ground Truth 差异巨大</li>
-                </ul>
-            </li>
-        </ul>
+        <h1>EEG-based VC Demo</h1>
     </div>
 
     <div id="audioGroups"></div>
@@ -125,19 +85,27 @@
 
                 const table = document.createElement('table');
                 const thead = document.createElement('thead');
-                thead.innerHTML = `
-                    <tr>
-                        <th>Ground Truth</th>
-                        <th>M1</th>
-                        <th>M2</th>
-                        <th>M3</th>
-                    </tr>
-                `;
+                thead.innerHTML = 
+                    `<tr>
+                        <th>Source Audio</th>
+                        <th>Target Audio</th>
+                        <th>FreeVC</th>
+                        <th>EEGVC(seen speakers)</th>
+                        <th>EEGVC(unseen speakers)</th>
+                    </tr>`;
                 table.appendChild(thead);
 
                 const tbody = document.createElement('tbody');
                 const row = document.createElement('tr');
                 
+                // 添加Source Audio列
+                const sourceCell = document.createElement('td');
+                const sourceAudio = document.createElement('audio');
+                sourceAudio.controls = true;
+                sourceAudio.src = `data/ref/${fileName.split('_')[1]}`;
+                sourceCell.appendChild(sourceAudio);
+                row.appendChild(sourceCell);
+
                 // 添加四种不同版本的音频
                 ['gt', 'freevc', 'ss', 'us'].forEach(version => {
                     const cell = document.createElement('td');
